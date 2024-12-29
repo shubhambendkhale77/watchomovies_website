@@ -2,17 +2,22 @@ const movieSearchBox = document.getElementById('movie-search-box');
 const searchList = document.getElementById('search-list');
 const resultGrid = document.getElementById('result-grid');
 
+// Store API key in an environment variable or secure location
+const API_KEY = '42733cd6'; // Replace this with your actual API key
+
 // Load movies from API
-async function loadMovies(searchTerm){
-    const URL = `https://omdbapi.com/?s=${searchTerm}&page=1&apikey=42733cd6`;
-    const res = await fetch(`${URL}`);
+async function loadMovies(searchTerm) {
+    const URL = `https://omdbapi.com/?s=${searchTerm}&page=1&apikey=${API_KEY}`;
+    const res = await fetch(URL, { referrerPolicy: "no-referrer" });
     const data = await res.json();
-    if(data.Response === "True") displayMovieList(data.Search);
+    if (data.Response === "True") {
+        displayMovieList(data.Search);
+    }
 }
 
-function findMovies(){
-    let searchTerm = movieSearchBox.value.trim();
-    if(searchTerm.length > 0){
+function findMovies() {
+    const searchTerm = movieSearchBox.value.trim();
+    if (searchTerm.length > 0) {
         searchList.classList.remove('hide-search-list');
         loadMovies(searchTerm);
     } else {
@@ -20,11 +25,11 @@ function findMovies(){
     }
 }
 
-function displayMovieList(movies){
+function displayMovieList(movies) {
     searchList.innerHTML = "";
     movies.forEach(movie => {
-        let moviePoster = movie.Poster !== "N/A" ? movie.Poster : "image_not_found.png";
-        let movieListItem = document.createElement('div');
+        const moviePoster = movie.Poster !== "N/A" ? movie.Poster : "image_not_found.png";
+        const movieListItem = document.createElement('div');
         movieListItem.dataset.id = movie.imdbID; // setting movie id in data-id
         movieListItem.classList.add('search-list-item');
         movieListItem.innerHTML = `
@@ -40,21 +45,21 @@ function displayMovieList(movies){
     loadMovieDetails();
 }
 
-function loadMovieDetails(){
+function loadMovieDetails() {
     const searchListMovies = searchList.querySelectorAll('.search-list-item');
     searchListMovies.forEach(movie => {
         movie.addEventListener('click', async () => {
             searchList.classList.add('hide-search-list');
             movieSearchBox.value = "";
-            const result = await fetch(`http://www.omdbapi.com/?i=${movie.dataset.id}&apikey=42733cd6`);
+            const result = await fetch(`https://www.omdbapi.com/?i=${movie.dataset.id}&apikey=${API_KEY}`);
             const movieDetails = await result.json();
             displayMovieDetails(movieDetails);
         });
     });
 }
 
-function displayMovieDetails(details){
-    let moviePoster = details.Poster !== "N/A" ? details.Poster : "image_not_found.png";
+function displayMovieDetails(details) {
+    const moviePoster = details.Poster !== "N/A" ? details.Poster : "image_not_found.png";
     resultGrid.innerHTML = `
     <div class="movie-poster">
         <img src="${moviePoster}" alt="Movie Poster">
@@ -75,8 +80,8 @@ function displayMovieDetails(details){
     </div>`;
 }
 
-window.addEventListener('click', (event) => {
-    if(event.target.className !== "form-control"){
+window.addEventListener('click', event => {
+    if (event.target.className !== "form-control") {
         searchList.classList.add('hide-search-list');
     }
 });
